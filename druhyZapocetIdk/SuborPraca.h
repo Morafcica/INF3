@@ -13,7 +13,7 @@ public:
 	void zapisDoSuboru(const char* retazec);
 	void doplnDoSuboru(const char* retazec);
 	void vypisOdIntervalu(int prvy, int druhy);
-	void vypisKonkretneSlovoRiadku(int poradieSlova, int poradieRiadku);
+	string vypisKonkretneSlovoRiadku(int poradieSlova, int poradieRiadku);
 	void vypisSubor();
 };
 

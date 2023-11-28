@@ -1,5 +1,6 @@
 #include "Hrac.h"
 #include <ctime>
+#include <iostream>
 #include "SuborPraca.h"
 
 int Hrac::getOdohrateMinuty()
@@ -26,9 +27,6 @@ void Hrac::vygenerujMinuty()
 	{
 		odohranyCas = new int[pocetZapasov];
 	}
-
-	srand(static_cast<unsigned>(time(0)));
-
 
 	for (int i = 0; i < pocetZapasov; i++) 
 	{
@@ -57,5 +55,5 @@ void Hrac::zapisDoSuboru()
 
 	sp.doplnDoSuboru(celyRetazec.c_str());
 
-
+	cout << celyRetazec << endl;
 }

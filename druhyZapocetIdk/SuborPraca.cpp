@@ -79,7 +79,7 @@ void SuborPraca::vypisOdIntervalu(int prvy, int druhy)
 	najprv si zo suboru zapise konkretny riadok a ten rozdeli do pola
 
 */
-void SuborPraca::vypisKonkretneSlovoRiadku(int poradieSlova, int poradieRiadku)
+string SuborPraca::vypisKonkretneSlovoRiadku(int poradieSlova, int poradieRiadku)
 {
 
 	ifstream citac(this->nazovSuboru);
@@ -89,34 +89,44 @@ void SuborPraca::vypisKonkretneSlovoRiadku(int poradieSlova, int poradieRiadku)
 		int poradie{ 1 };
 		while (getline(citac, riadok))
 		{
-			if (poradie == poradieRiadku) 
+			if (poradie == poradieRiadku)
 			{
-				citac >> riadok;	//tu si zoberie riadok vo formate "Meno Priezvisko Vek Plat"
+				citac.close();
+				break; 
 			}
+			poradie++;
 		}
 
 		citac.close();
 	}
 
-	const char* riadokVPoli = riadok.c_str(); //museli sme pretypovat
+	string hladaneSlovo;
+	int poradieHladaneho{ 1 };
 
-	char* inputCopy = new char[strlen(riadokVPoli) + 1]; //dymamicka alokacia (lebo new) potom treba vymazat
-	strcpy(inputCopy, riadokVPoli); //vlozi riadok do pola
-
-	const char* delimiter = " ";
-	const char* token = strtok(inputCopy, delimiter); //funguje podobne ako funkcia split()
-
-	int poradie{ 1 };
-	while (token != nullptr) {
-		if (poradie == poradieSlova) { //vyberie konkretny prvok pola
-			cout << token << endl;
+	for (int i = 0; i < (int)riadok.length() + 1; i++)
+	{
+		if (i == (int)riadok.length() && !hladaneSlovo.empty())
+		{
+			return hladaneSlovo;
 		}
 
-		token = strtok(nullptr, delimiter); //netusim ako toto funguje, ma v sebe vzdy len 1 prvok ktory sa meni??????
-		poradie++;
+		if (riadok[i] != ' ')
+		{
+			hladaneSlovo += riadok[i];
+		}
+		else
+		{
+			if (poradieHladaneho == poradieSlova)
+			{
+				return hladaneSlovo;
+			}
+			hladaneSlovo = "";
+
+			poradieHladaneho++;
+		}
 	}
 
-	delete[] inputCopy;
+	return "";
 }
 
 
