@@ -1,0 +1,257 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <cstdlib>
+#include "MemoryLeak.h"
+
+using namespace std;
+
+class A
+{
+private:
+    int data = 0;
+
+public:
+    A(int aData = 0) : data(aData) {}
+
+
+    //povodne
+    //A operator+(A op2) { return data + op2.data; }
+
+    //zmenene
+    friend A operator+(int value, const A& op)
+    {
+        A result;
+        result.data = value + op.data;
+        return result;
+    }
+
+    int getData() const { return data; }
+};
+
+int main()
+{
+    A a(10), c;
+    c = 10 + a;
+    cout << c.getData();
+    return 0;
+}
+
+---------------------------------------------------------------------------------------------------------
+
+//Do nasledujúcej triedy doplňte potrebnú metódu, aby sa kód vykonával korektne:
+
+class Pole {
+private:
+	unsigned aVelkost = 0;
+	int* aData = nullptr;
+public:
+	Pole(unsigned velkost)
+		: aVelkost(velkost),
+		aData(aVelkost > 0 ? new int[aVelkost] : nullptr) {}
+	~Pole() { delete[] aData; }
+	
+	
+	
+	//toto stacilo len pridat
+	// Přetížený operátor přiřazení
+	Pole& operator=(const Pole& other)
+	{
+		if (this != &other) // Ochrana před přiřazením do sebe sama
+		{
+			// Uvolnění starých dat
+			delete[] aData;
+
+			// Kopírování nových dat
+			aVelkost = other.aVelkost;
+			aData = new int[aVelkost];
+			std::copy(other.aData, other.aData + aVelkost, aData);
+		}
+
+		return *this;
+	}
+	
+};
+
+int main()
+{
+	Pole pole1(100);
+	Pole pole2(10);
+	pole1 = pole2;
+}
+
+---------------------------------------------------------------------------------------------------------
+
+class VynimkaBase
+{
+public:
+	void Oznam() { printf("A\n"); }
+};
+
+class VynimkaB : public VynimkaA
+{
+public:
+	void Oznam() { printf("B\n"); }
+};
+
+class VynimkaC : public VynimkaB
+{
+public:
+	void Oznam() { printf("C\n"); }
+};
+
+void Fun(int typ)
+{
+	switch (typ)
+	{
+	case 0: throw VynimkaBase(); break;
+	case 1: throw VynimkaA(); break;
+	case 2: throw VynimkaB(); break;
+	}
+
+	catch (VynimkaBase& ex)
+	{
+		ex.Oznam();
+	}
+}
+
+int main()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		try
+		{
+			Fun(i);
+		}
+	}
+
+	return 0;
+}
+
+
+upravte jid triedy VynimkaBase tak, aby sa po vykonani kodu na konzole zobrazilo:
+A
+B
+C
+
+//vysledok
+using namespace std;
+
+
+class VynimkaBase
+{
+public:
+	virtual void Oznam() { printf("A\n"); }
+};
+
+class VynimkaB : public VynimkaBase
+{
+public:
+	void Oznam() override { printf("B\n"); }
+};
+
+class VynimkaC : public VynimkaB
+{
+public:
+	void Oznam() override { printf("C\n"); }
+};
+
+void Fun(int typ)
+{
+	try
+	{
+		switch (typ)
+		{
+		case 0: throw VynimkaBase(); break;
+		case 1: throw VynimkaB(); break;
+		case 2: throw VynimkaC(); break;
+		}
+	}
+	catch (VynimkaBase& ex)
+	{
+		ex.Oznam();
+	}
+}
+
+int main()
+{
+	for (int i = 0; i < 3; i++)
+	{
+		try
+		{
+			Fun(i);
+		}
+		catch (...) // Přidána obecná klauzule pro zachycení všech výjimek
+		{
+			printf("Unknown exception\n");
+		}
+	}
+
+	return 0;
+}
+
+---------------------------------------------------------------------------------------------------------
+
+//upravte kod v triede Stvorec aby sa main vedel vykonat
+class Stvorec {
+	int strana = 0;
+public:
+	Stvorec() = default; // stacilo iba toto pridat
+	Stvorec(int pDlzka) : strana(pDlzka) {}
+};
+
+int main()
+{
+	Stvorec pole[10];
+
+	return 0;
+}
+
+---------------------------------------------------------------------------------------------------------
+
+//Pridaj do triedy Pole nieco co zabrani unikom pola
+
+#include <crtdbg.h>
+
+class Pole {
+private:
+	int* dataInt = nullptr;
+public:
+	Pole(int pocet = 0) : dataInt(pocet > 0 ? new int[pocet]:nullptr) {}
+	virtual ~Pole() { delete[] dataInt; } //dopisat virtual
+};
+
+class PoleIntDouble : public Pole {
+private:
+	double* dataDouble = nullptr;
+public:
+	PoleIntDouble(int pocet = 0)
+		: Pole(pocet), dataDouble(pocet > 0 ? new double[pocet] : nullptr) {}
+	~PoleIntDouble() override { delete[] dataDouble; } // Přidej virtuální destruktor, sem pridat
+
+};
+
+int main()
+{
+	Pole* p = new PoleIntDouble(10);
+	delete p;
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+
+
+}
+
+---------------------------------------------------------------------------------------------------------
+
+//ako upravit cislo na 2 des miesta
+
+int main() {
+    double cislo = 1.12458;
+
+    // Zaokrúhliť na 2 desatinné miesta
+    double zaokruhlene_cislo = round(cislo * 100) / 100;
+
+    // Vypísať zaokrúhlené číslo
+    std::cout << zaokruhlene_cislo << std::endl;
+
+    return 0;
+}
